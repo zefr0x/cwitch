@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 youtube-dl = "*"
+python-mpv = "*"
 
 [dev-packages]
 mypy = "*"

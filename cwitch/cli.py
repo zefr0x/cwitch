@@ -1,5 +1,8 @@
 """Command line interface for cwitch."""
 import argparse
+from datetime import datetime
+
+import mpv
 
 from __init__ import __version__, __name__
 import extractors
@@ -33,10 +36,10 @@ def get_args():
         "c", help="To play a live stream or search in the previous videos of a channel"
     )
     channel_parser.add_argument(
-        "-n", "--channel-name", type=str, required=True, help="The channel name"
+        "-n", "--channel-id", type=str, required=True, help="The channel ID"
     )
     # Tow mutually exclusive flags for different actions
-    group = channel_parser.add_mutually_exclusive_group()
+    group = channel_parser.add_mutually_exclusive_group(required=True)
     group.add_argument(
         "-s", "--stream", action="store_true", help="Watch live stream if there was"
     )
@@ -76,8 +79,25 @@ def get_args():
 
     # The video command
     video_parser = subparsers.add_parser("v", help="To watch a video with it's ID")
-    video_parser.add_argument("-b", type=str, help="help for b")
-    video_parser.add_argument("-c", type=str, action="store", default="", help="test")
+    video_parser.add_argument(
+        "-d",
+        "--videos-ids",
+        type=str,
+        nargs="+",
+        metavar="VIDEO",
+        help="One or more video ID. They will be opened as a playlist",
+        required=True,
+    )
+    video_parser.add_argument(
+        "-q",
+        "--quality",
+        type=str,
+        nargs="?",
+        metavar="format",
+        choices=["audio", "best", "worst"],
+        const="best",
+        help="Pick one of the folowing: %(choices)s (defaults to: best)",
+    )
 
     return parser, parser.parse_args()
 
@@ -106,7 +126,44 @@ def following_channels_actions(args, config):
 
 def video_actions(args):
     """Run the video subcommand according to it's options."""
-    ...
+    data = [extractors.extract_video(i) for i in args.videos_ids]
+
+    player = mpv.MPV(input_default_bindings=True, input_vo_keyboard=True, osc=True)
+
+    for video in data:
+        print(f"---- {video['id']} ----")
+        print("Title:", video["title"])
+        print("Date:", datetime.fromtimestamp(int(video["timestamp"])))
+        print("Uploader:", video["uploader"])
+        print("Duration:", video["duration"])
+        print("View count:", video["view_count"])
+        print("Thumbnail:", video["thumbnail"])
+
+        video_formats = [v["format_id"] for v in video["formats"]]
+        if args.quality and len(video_formats) >= 2:
+            if args.quality == "audio":
+                video_format = 0
+            elif args.quality == "best":
+                video_format = -1
+            elif args.quality == "worst":
+                video_format = 1
+        else:
+            try:
+                video_format = video_formats.index(
+                    input(f"Pick a format: {video_formats}\n==> ")
+                )
+            except ValueError:
+                # By default it will pick the best format.
+                video_format = -1
+
+        player.playlist_append(video["formats"][video_format]["url"])
+
+    player.playlist_pos = 0
+
+    while True:
+        if args.verbosity:
+            print(player.playlist)
+        player.wait_for_playback()
 
 
 def main():

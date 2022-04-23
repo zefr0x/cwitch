@@ -42,3 +42,11 @@ def extract_stream(channel_name: str) -> Optional[dict]:
             return ydl.extract_info(f"{BASE_URL}/{channel_name}")
         except youtube_dl.utils.DownloadError:
             return None
+
+
+def extract_video(video_id: str) -> dict:
+    """Return data about a video from it's id."""
+    ydl_opts = {"simulate": True, "quiet": True, "ignoreerrors": True}
+
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        return ydl.extract_info(f"{BASE_URL}/videos/{video_id}")

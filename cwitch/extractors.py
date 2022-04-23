@@ -9,7 +9,7 @@ import youtube_dl
 BASE_URL = "https://www.twitch.tv"
 
 
-def extract_videos(
+def extract_channel_videos(
     channel_name: str,
     count: int,
     filter: str = "all",

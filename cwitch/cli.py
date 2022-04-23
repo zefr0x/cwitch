@@ -39,11 +39,11 @@ def get_args():
         "-n", "--channel-id", type=str, required=True, help="The channel ID"
     )
     # Tow mutually exclusive flags for different actions
-    group = channel_parser.add_mutually_exclusive_group(required=True)
-    group.add_argument(
+    group1 = channel_parser.add_mutually_exclusive_group(required=True)
+    group1.add_argument(
         "-s", "--stream", action="store_true", help="Watch live stream if there was"
     )
-    group.add_argument(
+    group1.add_argument(
         "-l",
         "--list-videos",
         action="store_true",
@@ -51,10 +51,14 @@ def get_args():
     )
 
     channel_parser.add_argument(
-        "-i",
-        "--intractive",
-        action="store_true",
-        help="Enter the intractive mode for the videos list",
+        "-q",
+        "--quality",
+        type=str,
+        nargs="?",
+        metavar="format",
+        choices=["audio", "best", "middle", "worst"],
+        const="best",
+        help="Pick one of the folowing: %(choices)s (defaults to: best)",
     )
 
     # The Following channels command
@@ -69,12 +73,6 @@ def get_args():
             "List the statue of every channel you are following,"
             + "whether it's streaming or it's offline"
         ),
-    )
-    following_channels_parser.add_argument(
-        "-i",
-        "--intractive",
-        action="store_true",
-        help="Enter the intractive mode for following channels status list",
     )
 
     # The video command
@@ -94,7 +92,7 @@ def get_args():
         type=str,
         nargs="?",
         metavar="format",
-        choices=["audio", "best", "worst"],
+        choices=["audio", "best", "middle", "worst"],
         const="best",
         help="Pick one of the folowing: %(choices)s (defaults to: best)",
     )
@@ -105,18 +103,26 @@ def get_args():
 def channel_actions(args, config):
     """Run the channel subcommand according to it's options."""
     if args.stream:
-        data = extractors.extract_stream(args.channel_name)
+        data = extractors.extract_stream(args.channel_id)
+        if data:
+            play_media(args, [data])
     elif args.list_videos:
         data = extractors.extract_channel_videos(
-            args.channel_name, config["max_videos_count"]
+            args.channel_id, config["max_videos_count"]
         )
 
-        # TODO Organize the printed data to be readable.
-        print(data)
+        for i, video in enumerate(data["entries"]):
+            print_video_data(video, i)
 
-        if args.intractive:
-            # TODO Create intractive mode here and for the folowing channels' list also.
-            ...
+        videos_to_watch = input(
+            f"Pick videos to watch: {list(range(len(data['entries'])))}\n==> "
+        ).split(" ")
+        print("-" * 23)
+
+        play_media(
+            args,
+            [x for i, x in enumerate(data["entries"]) if str(i) in videos_to_watch],
+        )
 
 
 def following_channels_actions(args, config):
@@ -124,20 +130,16 @@ def following_channels_actions(args, config):
     ...
 
 
-def video_actions(args):
-    """Run the video subcommand according to it's options."""
-    data = [extractors.extract_video(i) for i in args.videos_ids]
+def play_media(args, data=None):
+    """Play a list of videos or streams."""
+    if not data:
+        # When using the v command.
+        data = [extractors.extract_video(i) for i in args.videos_ids]
 
     player = mpv.MPV(input_default_bindings=True, input_vo_keyboard=True, osc=True)
 
-    for video in data:
-        print(f"---- {video['id']} ----")
-        print("Title:", video["title"])
-        print("Date:", datetime.fromtimestamp(int(video["timestamp"])))
-        print("Uploader:", video["uploader"])
-        print("Duration:", video["duration"])
-        print("View count:", video["view_count"])
-        print("Thumbnail:", video["thumbnail"])
+    for i, video in enumerate(data):
+        print_video_data(video, i)
 
         video_formats = [v["format_id"] for v in video["formats"]]
         if args.quality and len(video_formats) >= 2:
@@ -145,6 +147,8 @@ def video_actions(args):
                 video_format = 0
             elif args.quality == "best":
                 video_format = -1
+            elif args.quality == "middle":
+                video_format = -2
             elif args.quality == "worst":
                 video_format = 1
         else:
@@ -160,10 +164,25 @@ def video_actions(args):
 
     player.playlist_pos = 0
 
-    while True:
-        if args.verbosity:
-            print(player.playlist)
-        player.wait_for_playback()
+    if args.verbosity:
+        print(player.playlist)
+
+    player.wait_for_shutdown()
+
+
+def print_video_data(video, i):
+    """Print video data in a readable way."""
+    print(f"---- {video['id'][1:]} ----[{i}]")
+    print("Title:", video["title"])
+    print("Date:", datetime.fromtimestamp(int(video["timestamp"])))
+    print("Uploader:", video["uploader"])
+    try:
+        print("Duration:", video["duration"])
+    except KeyError:
+        # If it was a live stream there will be no duration
+        pass
+    print("View count:", video["view_count"])
+    print("Thumbnail:", video["thumbnail"])
 
 
 def main():
@@ -187,4 +206,4 @@ def main():
     elif args.subcommand == "s":
         following_channels_actions(args, config)
     elif args.subcommand == "v":
-        video_actions(args)
+        play_media(args)

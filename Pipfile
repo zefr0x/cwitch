@@ -12,6 +12,7 @@ mypy = "*"
 flake8 = "*"
 pydocstyle = "*"
 black = "*"
+shtab = "*"
 
 [requires]
 python_version = "3.10"

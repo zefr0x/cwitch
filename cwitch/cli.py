@@ -1,6 +1,6 @@
 """Command line interface for cwitch."""
 import argparse
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import mpv
 
@@ -9,8 +9,8 @@ import extractors
 from config import get_config, get_following_channels
 
 
-def get_args():
-    """Parse the args from stdin then return them in a readable way for python."""
+def get_parser():
+    """Return a parser object."""
     parser = argparse.ArgumentParser(
         prog=__name__,
         description="Watch Twitch live streams and videos and track channels' activities",
@@ -97,7 +97,7 @@ def get_args():
         help="Pick one of the folowing: %(choices)s (defaults to: best)",
     )
 
-    return parser, parser.parse_args()
+    return parser
 
 
 def channel_actions(args, config):
@@ -111,17 +111,18 @@ def channel_actions(args, config):
             args.channel_id, config["max_videos_count"]
         )
 
-        for i, video in enumerate(data["entries"]):
-            print_video_data(video, i)
+        for video in data["entries"]:
+            print_video_data(video, args)
 
+        print("-" * 23)
         videos_to_watch = input(
-            f"Pick videos to watch: {list(range(len(data['entries'])))}\n==> "
+            f"Pick videos to watch: {list(range(1, len(data['entries'])+1))}\n==> "
         ).split(" ")
         print("-" * 23)
 
         play_media(
             args,
-            [x for i, x in enumerate(data["entries"]) if str(i) in videos_to_watch],
+            [x for i, x in enumerate(data["entries"]) if str(i + 1) in videos_to_watch],
         )
 
 
@@ -132,14 +133,26 @@ def following_channels_actions(args, config):
 
 def play_media(args, data=None):
     """Play a list of videos or streams."""
-    if not data:
+    if data is None:
         # When using the v command.
         data = [extractors.extract_video(i) for i in args.videos_ids]
 
-    player = mpv.MPV(input_default_bindings=True, input_vo_keyboard=True, osc=True)
+    player = mpv.MPV(
+        input_default_bindings=True,
+        input_vo_keyboard=True,
+        osc=True,
+        title=__name__,
+    )
 
-    for i, video in enumerate(data):
-        print_video_data(video, i)
+    # script_dir = str(Path.home())+'/.config/mpv/scripts/'
+    # [self.player.command('load-script', script_dir+script) for script in os.listdir(script_dir)]
+
+    # @player.property_observer("time-pos")
+    # def time_observer(_name, value):
+    #     ...
+
+    for video in data:
+        print_video_data(video, args)
 
         video_formats = [v["format_id"] for v in video["formats"]]
         if args.quality and len(video_formats) >= 2:
@@ -160,34 +173,48 @@ def play_media(args, data=None):
                 # By default it will pick the best format.
                 video_format = -1
 
-        player.playlist_append(video["formats"][video_format]["url"])
+        player.playlist_append(
+            # Since mpv discards what is beyond the #, we can use it as a title in the playlist
+            video["formats"][video_format]["url"] + "#" + video["title"],
+            media_title=video["title"],
+        )
 
     player.playlist_pos = 0
 
+    player.wait_until_playing()
     if args.verbosity:
         print(player.playlist)
 
     player.wait_for_shutdown()
 
 
-def print_video_data(video, i):
+def print_video_data(video, args):
     """Print video data in a readable way."""
-    print(f"---- {video['id'][1:]} ----[{i}]")
+    print(f"---- {video['webpage_url_basename']} ----[{video['playlist_index']}]")
     print("Title:", video["title"])
     print("Date:", datetime.fromtimestamp(int(video["timestamp"])))
-    print("Uploader:", video["uploader"])
     try:
-        print("Duration:", video["duration"])
+        print("Duration:", timedelta(seconds=video["duration"]))
     except KeyError:
         # If it was a live stream there will be no duration
         pass
     print("View count:", video["view_count"])
-    print("Thumbnail:", video["thumbnail"])
+    if args.verbosity:
+        print("Uploader:", video["uploader"])
+        print("Webpage URL:", video["webpage_url"])
+        print("Thumbnails URLs:", video["thumbnail"], video["thumbnails"])
+        print("Stream URLs:", [(x["format_id"], x["url"]) for x in video["formats"]])
+        print("Subtitles:", video["subtitles"])
+        print("URL:", video["url"])
+        print("FPS:", video["fps"])
+        print("width & height:", video["width"], video["height"])
+        print("Format:", video["format"])
 
 
 def main():
     """Run cwitch from the command line."""
-    parser, args = get_args()
+    parser = get_parser()
+    args = parser.parse_args()
 
     if args.verbosity:
         print(args)

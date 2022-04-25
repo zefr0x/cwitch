@@ -24,7 +24,7 @@ def get_parser():
         "-V", "--version", action="store_true", help="Print %(prog)s version."
     )
     parser.add_argument(
-        "--config-file", type=argparse.FileType('r'), help="An alternative config file."
+        "--config-file", type=argparse.FileType("r"), help="An alternative config file."
     )
 
     # Create a second layer parsers
@@ -38,6 +38,7 @@ def get_parser():
     channel_parser = subparsers.add_parser(
         "c", help="To play a live stream or search in the previous videos of a channel"
     )
+    # TODO Auto completion for channels names from the channels list file.
     channel_parser.add_argument(
         "-n", "--channel-id", type=str, required=True, help="The channel ID"
     )
@@ -69,16 +70,25 @@ def get_parser():
         "s", help="List and view the status of the channels that you follow"
     )
     following_channels_parser.add_argument(
-        "-s",
-        "--status",
+        "-o",
+        "--online",
         action="store_true",
-        help=(
-            "List the statue of every channel you are following,"
-            + "whether it's streaming or it's offline"
-        ),
+        help="Show only online channels",
     )
     following_channels_parser.add_argument(
-        "--channels-file", type=argparse.FileType('r'), help="An alternative channels list file."
+        "--channels-file",
+        type=argparse.FileType("r"),
+        help="An alternative channels list file.",
+    )
+    following_channels_parser.add_argument(
+        "-q",
+        "--quality",
+        type=str,
+        nargs="?",
+        metavar="format",
+        choices=["audio", "best", "middle", "worst"],
+        const="best",
+        help="Pick one of the folowing: %(choices)s (defaults to: best)",
     )
 
     # The video command
@@ -112,6 +122,7 @@ def channel_actions(args, config):
         data = extractors.extract_stream(args.channel_id)
         if data:
             play_media(args, [data])
+        # TODO Error handling when the channel is offline.
     elif args.list_videos:
         data = extractors.extract_channel_videos(
             args.channel_id, config["playlist_fetching"]["max_videos_count"]
@@ -135,7 +146,28 @@ def channel_actions(args, config):
 def following_channels_actions(args, config):
     """Run the video subcommand according to it's options."""
     channels = get_following_channels(args.channels_file)
-    ...
+
+    data = []
+
+    for channel in channels:
+        if args.verbosity:
+            print("Checking for:", channel["id"])
+
+        channel_stream_data = extractors.extract_stream(channel["id"])
+        # TODO color the output
+        if channel_stream_data:
+            print(f"[{len(data)}] ({channel['name']}) is online")
+            data.append(channel_stream_data)
+        elif not args.online:
+            print(f"[---] ({channel['name']}) is offline")
+
+    if data:
+        to_watch = input(
+            f"Pick streams to watch: {list(range(len(data)))}\n==> "
+        ).split()
+
+        to_watch_data = [d for i, d in enumerate(data) if str(i) in to_watch]
+        play_media(args, to_watch_data)
 
 
 def play_media(args, data=None):

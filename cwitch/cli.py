@@ -23,6 +23,9 @@ def get_parser():
     parser.add_argument(
         "-V", "--version", action="store_true", help="Print %(prog)s version."
     )
+    parser.add_argument(
+        "--config-file", type=argparse.FileType('r'), help="An alternative config file."
+    )
 
     # Create a second layer parsers
     subparsers = parser.add_subparsers(
@@ -73,6 +76,9 @@ def get_parser():
             "List the statue of every channel you are following,"
             + "whether it's streaming or it's offline"
         ),
+    )
+    following_channels_parser.add_argument(
+        "--channels-file", type=argparse.FileType('r'), help="An alternative channels list file."
     )
 
     # The video command
@@ -128,6 +134,7 @@ def channel_actions(args, config):
 
 def following_channels_actions(args, config):
     """Run the video subcommand according to it's options."""
+    channels = get_following_channels(args.channels_file)
     ...
 
 
@@ -226,7 +233,7 @@ def main():
         parser.print_help()
         exit(0)
 
-    config = get_config("")
+    config = get_config(args.config_file)
 
     if args.subcommand == "c":
         channel_actions(args, config)

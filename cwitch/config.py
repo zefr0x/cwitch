@@ -1,20 +1,24 @@
 """Parse the config and the channels list."""
 from configparser import ConfigParser, NoOptionError, NoSectionError
 from pathlib import Path
-from typing import Optional
+from typing import Optional, TextIO
 
 from __init__ import __name__ as prog_name
 
 
-def get_config(config_file: Optional[str] = None) -> dict:
+def get_config(config_file: Optional[TextIO] = None) -> dict:
     """Parse a config file."""
-    if config_file is None:
-        config_file_path = Path.joinpath(Path.home(), f".config/{prog_name}/config.ini")
-    else:
-        config_file_path = Path(config_file)
-
     config = ConfigParser()
-    config.read(config_file_path)
+
+    try:
+        if config_file is None:
+            config_file = open(
+                Path.joinpath(Path.home(), f".config/{prog_name}/config.ini"), "r"
+            )
+
+        config.read_file(config_file)
+    except FileNotFoundError:
+        pass
 
     options = {"playlist_fetching": {"max_videos_count": 5}}
 
@@ -28,21 +32,25 @@ def get_config(config_file: Optional[str] = None) -> dict:
     return options
 
 
-def get_following_channels(channels_file: Optional[str] = None) -> tuple:
+def get_following_channels(channels_file: Optional[TextIO] = None) -> tuple:
     """Parse the following channels' list from a file."""
-    if channels_file is None:
-        channels_file_path = Path.joinpath(Path.home(), ".config/cwitch/channels.ini")
-    else:
-        channels_file_path = Path(channels_file)
-
     channels = ConfigParser()
-    channels.read(channels_file_path)
+
+    try:
+        if channels_file is None:
+            channels_file = open(
+                Path.joinpath(Path.home(), ".config/cwitch/channels.ini"), "r"
+            )
+
+        channels.read_file(channels_file)
+    except FileNotFoundError:
+        pass
 
     channels_list = []
 
     for channel in channels.sections():
         try:
-            channels_list.append({"name": channel, "id": channels[channel]["id"]})
+            channels_list.append({"name": channel, "id": channels.get(channel, "id")})
         except NoOptionError:
             continue
 

@@ -13,7 +13,7 @@ def get_parser():
     """Return a parser object."""
     parser = argparse.ArgumentParser(
         prog=prog_name,
-        description="Watch Twitch live streams and videos and track channels' activities",
+        description="Watch Twitch live streams and videos and track channels' activities.",
         epilog="",
     )
 
@@ -30,28 +30,35 @@ def get_parser():
     # Create a second layer parsers
     subparsers = parser.add_subparsers(
         title="Subcommands",
-        description="Pick a subcommand for the operation you want",
+        description="Pick a subcommand for the operation you want.",
         dest="subcommand",
     )
 
     # The channel command
     channel_parser = subparsers.add_parser(
-        "c", help="To play a live stream or search in the previous videos of a channel"
+        "c", help="To play a live stream or search in the previous videos of a channel."
     )
     # TODO Auto completion for channels names from the channels list file.
     channel_parser.add_argument(
-        "-n", "--channel-id", type=str, required=True, help="The channel ID"
+        "channels_ids",
+        type=str,
+        nargs="+",
+        metavar="CHANNEL-ID",
+        help="The channel ID.",
     )
     # Tow mutually exclusive flags for different actions
     group1 = channel_parser.add_mutually_exclusive_group(required=True)
     group1.add_argument(
-        "-s", "--stream", action="store_true", help="Watch live stream if there was"
+        "-s",
+        "--stream",
+        action="store_true",
+        help="Play the live stream if there was.",
     )
     group1.add_argument(
         "-l",
         "--list-videos",
         action="store_true",
-        help="List the channel's videos",
+        help="List the channel's videos.",
     )
 
     channel_parser.add_argument(
@@ -62,18 +69,18 @@ def get_parser():
         metavar="format",
         choices=["audio", "best", "middle", "worst"],
         const="best",
-        help="Pick one of the folowing: %(choices)s (defaults to: best)",
+        help="Pick one of the folowing: %(choices)s (defaults to: best).",
     )
 
     # The Following channels command
     following_channels_parser = subparsers.add_parser(
-        "s", help="List and view the status of the channels that you follow"
+        "s", help="List and view the status of the channels that you follow."
     )
     following_channels_parser.add_argument(
         "-o",
         "--online",
         action="store_true",
-        help="Show only online channels",
+        help="Show only online channels.",
     )
     following_channels_parser.add_argument(
         "--channels-file",
@@ -88,19 +95,19 @@ def get_parser():
         metavar="format",
         choices=["audio", "best", "middle", "worst"],
         const="best",
-        help="Pick one of the folowing: %(choices)s (defaults to: best)",
+        help="Pick one of the folowing: %(choices)s (defaults to: best).",
     )
 
     # The video command
-    video_parser = subparsers.add_parser("v", help="To watch a video with it's ID")
+    video_parser = subparsers.add_parser(
+        "v", help="Watch one or more video with the ID."
+    )
     video_parser.add_argument(
-        "-d",
-        "--videos-ids",
+        "videos_ids",
         type=str,
         nargs="+",
-        metavar="VIDEO",
-        help="One or more video ID. They will be opened as a playlist",
-        required=True,
+        metavar="VIDEO-ID",
+        help="One or more video ID. They will be opened as a playlist.",
     )
     video_parser.add_argument(
         "-q",
@@ -110,7 +117,7 @@ def get_parser():
         metavar="format",
         choices=["audio", "best", "middle", "worst"],
         const="best",
-        help="Pick one of the folowing: %(choices)s (defaults to: best)",
+        help="Pick one of the folowing: %(choices)s (defaults to: best).",
     )
 
     return parser
@@ -119,27 +126,42 @@ def get_parser():
 def channel_actions(args, config):
     """Run the channel subcommand according to it's options."""
     if args.stream:
-        data = extractors.extract_stream(args.channel_id)
+        data = [extractors.extract_stream(channel) for channel in args.channel_id]
         if data:
-            play_media(args, [data])
+            play_media(args, data)
         # TODO Error handling when the channel is offline.
     elif args.list_videos:
-        data = extractors.extract_channel_videos(
-            args.channel_id, config["playlist_fetching"]["max_videos_count"]
-        )
+        data = []
+        for channel_id in args.channels_ids:
+            if args.verbosity:
+                print("Fetching data for", channel_id)
 
-        for video in data["entries"]:
-            print_video_data(video, args)
+            data.append(
+                extractors.extract_channel_videos(
+                    channel_id, config["playlist_fetching"]["max_videos_count"]
+                )
+            )
 
-        print("-" * 23)
-        videos_to_watch = input(
-            f"Pick videos to watch: {list(range(1, len(data['entries'])+1))}\n==> "
-        ).split(" ")
-        print("-" * 23)
+        to_watch_data = []
+        for sub_data in data:
+            for video in sub_data["entries"]:
+                print_video_data(video, args)
+
+            print("-" * 23)
+            videos_to_watch = input(
+                f"Pick videos to watch: {list(range(1, len(sub_data['entries'])+1))}\n==> "
+            ).split(" ")
+            print("-" * 23)
+
+            to_watch_data += [
+                x
+                for i, x in enumerate(sub_data["entries"])
+                if str(i + 1) in videos_to_watch
+            ]
 
         play_media(
             args,
-            [x for i, x in enumerate(data["entries"]) if str(i + 1) in videos_to_watch],
+            to_watch_data,
         )
 
 
@@ -176,6 +198,10 @@ def play_media(args, data=None):
         # When using the v command.
         data = [extractors.extract_video(i) for i in args.videos_ids]
 
+    if all([not x for x in data]):
+        # When all videos doesn't exist
+        return None
+
     player = mpv.MPV(
         input_default_bindings=True,
         input_vo_keyboard=True,
@@ -191,6 +217,9 @@ def play_media(args, data=None):
     #     ...
 
     for video in data:
+        if video is None:
+            continue
+
         print_video_data(video, args)
 
         video_formats = [v["format_id"] for v in video["formats"]]

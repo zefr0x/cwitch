@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 import mpv
 
-from __init__ import __version__, __name__
+from __init__ import __version__ as prog_version, __name__ as prog_name
 import extractors
 from config import get_config, get_following_channels
 
@@ -12,7 +12,7 @@ from config import get_config, get_following_channels
 def get_parser():
     """Return a parser object."""
     parser = argparse.ArgumentParser(
-        prog=__name__,
+        prog=prog_name,
         description="Watch Twitch live streams and videos and track channels' activities",
         epilog="",
     )
@@ -108,7 +108,7 @@ def channel_actions(args, config):
             play_media(args, [data])
     elif args.list_videos:
         data = extractors.extract_channel_videos(
-            args.channel_id, config["max_videos_count"]
+            args.channel_id, config["playlist_fetching"]["max_videos_count"]
         )
 
         for video in data["entries"]:
@@ -141,7 +141,7 @@ def play_media(args, data=None):
         input_default_bindings=True,
         input_vo_keyboard=True,
         osc=True,
-        title=__name__,
+        title=prog_name,
     )
 
     # script_dir = str(Path.home())+'/.config/mpv/scripts/'
@@ -190,7 +190,7 @@ def play_media(args, data=None):
 
 def print_video_data(video, args):
     """Print video data in a readable way."""
-    print(f"---- {video['webpage_url_basename']} ----[{video['playlist_index']}]")
+    print(f"---- {video['webpage_url_basename']} ----[{video['playlist_index'] or 0}]")
     print("Title:", video["title"])
     print("Date:", datetime.fromtimestamp(int(video["timestamp"])))
     try:
@@ -220,7 +220,7 @@ def main():
         print(args)
 
     if args.version:
-        print(f"{__name__} {__version__}")
+        print(f"{prog_name} {prog_version}")
         exit(0)
     elif not args.subcommand:
         parser.print_help()

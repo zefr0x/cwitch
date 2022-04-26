@@ -9,6 +9,25 @@ import youtube_dl
 BASE_URL = "https://www.twitch.tv"
 
 
+class Logger(object):
+    """Logger for youtube-dl."""
+
+    def debug(self, msg):
+        """Don't print debug messages."""
+        pass
+
+    def warning(self, msg):
+        """Don't print warning messages."""
+        pass
+
+    def error(self, msg):
+        """Handle error messages."""
+        if msg.endswith(" does not exist"):
+            print(msg)
+        elif msg.endswith(" is offline"):
+            pass
+
+
 def extract_channel_videos(
     channel_name: str,
     count: int,
@@ -21,6 +40,7 @@ def extract_channel_videos(
     ydl_opts = {
         "simulate": True,
         "quiet": True,
+        "logger": Logger(),
         "playliststart": 1,
         "playlistend": count,
         "playlistreverse": reverse,
@@ -35,7 +55,12 @@ def extract_channel_videos(
 
 def extract_stream(channel_name: str) -> Optional[dict]:
     """Return data about a steam if there was an active one on the input channel."""
-    ydl_opts = {"simulate": True, "quiet": True, "ignoreerrors": True}
+    ydl_opts = {
+        "simulate": True,
+        "quiet": True,
+        "ignoreerrors": True,
+        "logger": Logger(),
+    }
 
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         try:
@@ -47,7 +72,12 @@ def extract_stream(channel_name: str) -> Optional[dict]:
 
 def extract_video(video_id: str) -> dict:
     """Return data about a video from it's id."""
-    ydl_opts = {"simulate": True, "quiet": True, "ignoreerrors": True}
+    ydl_opts = {
+        "simulate": True,
+        "quiet": True,
+        "ignoreerrors": True,
+        "logger": Logger(),
+    }
 
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         return ydl.extract_info(f"{BASE_URL}/videos/{video_id}")

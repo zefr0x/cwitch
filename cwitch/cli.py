@@ -1,10 +1,10 @@
 """Command line interface for cwitch."""
 import argparse
-from datetime import datetime, timedelta
+# from datetime import datetime, timedelta
 
-import mpv
+# import mpv
 
-from __init__ import __version__ as prog_version, __name__ as prog_name
+from __init__ import __version__ as prog_version, prog_name
 import extractors
 from config import get_config, get_following_channels
 
@@ -126,7 +126,7 @@ def get_parser():
 def channel_actions(args, config):
     """Run the channel subcommand according to it's options."""
     if args.stream:
-        data = [extractors.extract_stream(channel) for channel in args.channel_id]
+        data = [extractors.extract_stream(channel) for channel in args.channels_ids]
         if data:
             play_media(args, data)
         # TODO Error handling when the channel is offline.
@@ -169,6 +169,13 @@ def following_channels_actions(args, config):
     """Run the video subcommand according to it's options."""
     channels = get_following_channels(args.channels_file)
 
+    if not channels:
+        # TODO color the output
+        print(
+            "Error:",
+            "Can't find any channels on your list! Add some channels to use this command.",
+        )
+
     data = []
 
     for channel in channels:
@@ -194,6 +201,8 @@ def following_channels_actions(args, config):
 
 def play_media(args, data=None):
     """Play a list of videos or streams."""
+    import mpv
+
     if data is None:
         # When using the v command.
         data = [extractors.extract_video(i) for i in args.videos_ids]
@@ -258,7 +267,13 @@ def play_media(args, data=None):
 
 def print_video_data(video, args):
     """Print video data in a readable way."""
-    print(f"---- {video['webpage_url_basename']} ----[{video['playlist_index'] or 0}]")
+    from datetime import datetime, timedelta
+
+    print(f"---- {video['webpage_url_basename']} ----", end="")
+    if video["playlist_index"]:
+        print(f"[{video['playlist_index']}]")
+    else:
+        print()
     print("Title:", video["title"])
     print("Date:", datetime.fromtimestamp(int(video["timestamp"])))
     try:

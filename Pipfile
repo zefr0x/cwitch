@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 youtube-dl = "*"
 python-mpv = "*"
+prompt-toolkit = "*"
 
 [dev-packages]
 mypy = "*"

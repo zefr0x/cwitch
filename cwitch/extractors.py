@@ -66,7 +66,6 @@ def extract_stream(channel_name: str) -> Optional[dict]:
         try:
             return ydl.extract_info(f"{BASE_URL}/{channel_name}")
         except youtube_dl.utils.DownloadError:
-            # TODO Don't let youtube_dl print an error message by itself.
             return None
 
 

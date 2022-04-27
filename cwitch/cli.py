@@ -133,14 +133,13 @@ def channel_actions(args, config):
     if args.stream:
         data = []
 
-        with ProgressBar(
-            title=HTML(
-                f"<style bg='white' fg='black'>Fetching {len(args.channels_ids)} "
-                + "streams data...</style>"
-            )
-        ) as pb:
+        with ProgressBar() as pb:
             for channel in pb(args.channels_ids):
-                stream_data = extractors.extract_stream(channel)
+                pb.title = HTML(
+                    f"<style bg='white' fg='black'>Fetching {channel} "
+                    + "stream data...</style>"
+                )
+                stream_data = extractors.extract_stream(channel, args.verbosity)
                 if stream_data:
                     data.append(stream_data)
                 else:
@@ -153,19 +152,17 @@ def channel_actions(args, config):
 
     elif args.list_videos:
         data = []
-        with ProgressBar(
-            title=HTML(
-                f"<style bg='white' fg='black'>Fetching {len(args.channels_ids)} "
-                + "videos list...</style>"
-            )
-        ) as pb:
+        with ProgressBar() as pb:
             for channel_id in pb(args.channels_ids):
-                if args.verbosity:
-                    print("Fetching data for", channel_id)
-
+                pb.title = HTML(
+                    f"<style bg='white' fg='black'>Fetching {channel_id} "
+                    + "videos list...</style>"
+                )
                 data.append(
                     extractors.extract_channel_videos(
-                        channel_id, config["playlist_fetching"]["max_videos_count"]
+                        channel_id,
+                        config["playlist_fetching"]["max_videos_count"],
+                        verbosity=args.verbosity,
                     )
                 )
 
@@ -223,17 +220,15 @@ def following_channels_actions(args, config):
     data = []
     streams_titles = {}
 
-    with ProgressBar(
-        title=HTML(
-            f"<style bg='white' fg='black'>Fetching {len(channels)} streams data...</style>"
-        )
-    ) as pb:
+    with ProgressBar() as pb:
         for channel in pb(channels):
-            if args.verbosity:
-                print("Checking for:", channel["id"])
+            pb.title = HTML(
+                f"<style bg='white' fg='black'>Checking for {channel['id']}...</style>"
+            )
 
-            channel_stream_data = extractors.extract_stream(channel["id"])
-            # TODO color the output
+            channel_stream_data = extractors.extract_stream(
+                channel["id"], args.verbosity
+            )
             if channel_stream_data:
                 print_formatted_text(
                     HTML(
@@ -279,7 +274,13 @@ def play_media(args, data=None):
 
     if data is None:
         # When using the v command.
-        data = [extractors.extract_video(i) for i in args.videos_ids]
+        data = []
+        with ProgressBar() as pb:
+            for video_id in pb(args.videos_ids):
+                pb.title = HTML(
+                    f"<style bg='white' fg='black'>Fetching {video_id} data...</style>"
+                )
+                data.append(extractors.extract_video(video_id, args.verbosity))
 
         if all([not x for x in data]):
             # When all videos doesn't exist.
@@ -339,7 +340,7 @@ def play_media(args, data=None):
 
     player.wait_until_playing()
     if args.verbosity:
-        print(player.playlist)
+        print_formatted_text(HTML("<orange>#</orange>"), player.playlist)
 
     player.wait_for_shutdown()
 
@@ -382,7 +383,7 @@ def print_video_data(video, args):
         print_formatted_text(HTML("<b>URL:</b>"), video["url"])
         print_formatted_text(HTML("<b>FPS:</b>"), video["fps"])
         print_formatted_text(
-            HTML("<b>width & height:</b>"), video["width"], video["height"]
+            HTML("<b>width and height:</b>"), video["width"], video["height"]
         )
         print_formatted_text(HTML("<b>Format:</b>"), video["format"])
 
@@ -393,7 +394,7 @@ def main():
     args = parser.parse_args()
 
     if args.verbosity:
-        print(args)
+        print_formatted_text(HTML("<orange>#</orange>"), args)
 
     if args.version:
         print(f"{prog_name} {prog_version}")

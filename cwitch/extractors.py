@@ -12,13 +12,18 @@ BASE_URL = "https://www.twitch.tv"
 class Logger(object):
     """Logger for youtube-dl."""
 
+    def __init__(self, verbosity):
+        """Take the verbosity mode."""
+        self.verbosity = verbosity
+
     def debug(self, msg):
         """Don't print debug messages."""
         pass
 
     def warning(self, msg):
         """Don't print warning messages."""
-        pass
+        if self.verbosity:
+            print(msg)
 
     def error(self, msg):
         """Handle error messages."""
@@ -35,12 +40,13 @@ def extract_channel_videos(
     sort_method: str = "time",
     reverse: bool = False,
     random: bool = False,
+    verbosity: bool = False,
 ) -> dict:
     """Return a channel's videos data."""
     ydl_opts = {
         "simulate": True,
         "quiet": True,
-        "logger": Logger(),
+        "logger": Logger(verbosity),
         "playliststart": 1,
         "playlistend": count,
         "playlistreverse": reverse,
@@ -53,13 +59,13 @@ def extract_channel_videos(
         )
 
 
-def extract_stream(channel_name: str) -> Optional[dict]:
+def extract_stream(channel_name: str, verbosity: bool = False) -> Optional[dict]:
     """Return data about a steam if there was an active one on the input channel."""
     ydl_opts = {
         "simulate": True,
         "quiet": True,
         "ignoreerrors": True,
-        "logger": Logger(),
+        "logger": Logger(verbosity),
     }
 
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
@@ -69,13 +75,13 @@ def extract_stream(channel_name: str) -> Optional[dict]:
             return None
 
 
-def extract_video(video_id: str) -> dict:
+def extract_video(video_id: str, verbosity: bool = False) -> dict:
     """Return data about a video from it's id."""
     ydl_opts = {
         "simulate": True,
         "quiet": True,
         "ignoreerrors": True,
-        "logger": Logger(),
+        "logger": Logger(verbosity),
     }
 
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:

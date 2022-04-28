@@ -4,10 +4,10 @@ import argparse
 # from mpv import MPV
 from prompt_toolkit import print_formatted_text, HTML
 
-from __init__ import __version__, prog_name
-import subcommands
-import printers
-import prompts
+from .__init__ import __version__, prog_name
+from . import subcommands
+from . import printers
+from . import prompts
 
 
 def get_parser() -> argparse.ArgumentParser:
@@ -15,7 +15,7 @@ def get_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog=prog_name,
         description="watch Twitch live streams and videos and track channels' activities.",
-        epilog="v" + __version__,
+        # epilog="v" + __version__,
     )
 
     parser.add_argument(

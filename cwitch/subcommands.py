@@ -5,10 +5,10 @@ import threading
 from prompt_toolkit import print_formatted_text, HTML
 from prompt_toolkit.shortcuts import ProgressBar
 
-import extractors
-import printers
-import prompts
-from config import get_config, get_following_channels
+from . import extractors
+from . import printers
+from . import prompts
+from .config import get_config, get_following_channels
 
 
 def channels_command(args) -> list:

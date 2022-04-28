@@ -3,7 +3,7 @@ from typing import Optional, TextIO
 from configparser import ConfigParser, NoOptionError, NoSectionError
 from pathlib import Path
 
-from __init__ import prog_name
+from .__init__ import prog_name
 
 
 def get_config(config_file: Optional[TextIO] = None) -> dict:

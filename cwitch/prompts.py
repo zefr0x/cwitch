@@ -1,8 +1,8 @@
 """CLI prompts."""
 from prompt_toolkit import prompt, HTML
 
-import auto_completion
-import input_validation
+from . import auto_completion
+from . import input_validation
 
 
 def formats_prompt(media_formats: list) -> int:

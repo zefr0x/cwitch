@@ -1,5 +1,6 @@
 """Command line interface for cwitch."""
 import argparse
+import threading
 
 # from datetime import datetime, timedelta
 
@@ -128,43 +129,72 @@ def get_parser():
     return parser
 
 
-def channel_actions(args, config):
-    """Run the channel subcommand according to it's options."""
+def channels_command(args, config):
+    """Run the channel subcommand."""
     if args.stream:
         data = []
 
-        with ProgressBar() as pb:
-            for channel in pb(args.channels_ids):
-                pb.title = HTML(
-                    f"<style bg='white' fg='black'>Fetching {channel} "
-                    + "stream data...</style>"
+        def fetch_stream_data(channel_id: str) -> None:
+            stream_data = extractors.extract_stream(channel_id, args.verbosity)
+            if stream_data:
+                data.append(stream_data)
+            else:
+                print_formatted_text(
+                    HTML(f"<red>Error:</red> ({channel_id}) is <b>offline</b>.")
                 )
-                stream_data = extractors.extract_stream(channel, args.verbosity)
-                if stream_data:
-                    data.append(stream_data)
-                else:
-                    print_formatted_text(
-                        HTML(f"<red>Error:</red> ({channel}) is <b>offline</b>.")
+
+        threads = {}
+        for channel_id in args.channels_ids:
+            threads.update(
+                {
+                    channel_id: threading.Thread(
+                        target=fetch_stream_data, args=(channel_id,)
                     )
+                }
+            )
+            threads[channel_id].daemon = True
+            threads[channel_id].start()
+
+        with ProgressBar(
+            title=HTML("<style bg='white' fg='black'>Fetching streams data...</style>")
+        ) as pb:
+            for channel_id, thread in pb(threads.items()):
+                if thread.is_alive():
+                    thread.join()
 
         if data:
             play_media(args, data)
 
     elif args.list_videos:
         data = []
-        with ProgressBar() as pb:
-            for channel_id in pb(args.channels_ids):
-                pb.title = HTML(
-                    f"<style bg='white' fg='black'>Fetching {channel_id} "
-                    + "videos list...</style>"
+
+        def fetch_channel_videos_list(channel_id: str) -> None:
+            data.append(
+                extractors.extract_channel_videos(
+                    channel_id,
+                    config["playlist_fetching"]["max_videos_count"],
+                    verbosity=args.verbosity,
                 )
-                data.append(
-                    extractors.extract_channel_videos(
-                        channel_id,
-                        config["playlist_fetching"]["max_videos_count"],
-                        verbosity=args.verbosity,
+            )
+
+        threads = {}
+        for channel_id in args.channels_ids:
+            threads.update(
+                {
+                    channel_id: threading.Thread(
+                        target=fetch_channel_videos_list, args=(channel_id,)
                     )
-                )
+                }
+            )
+            threads[channel_id].daemon = True
+            threads[channel_id].start()
+
+        with ProgressBar(
+            title=HTML("<style bg='white' fg='black'>Fetching videos data...</style>")
+        ) as pb:
+            for channel_id, thread in pb(threads.items()):
+                if thread.is_alive():
+                    thread.join()
 
         to_watch_data = []
         for sub_data in data:
@@ -201,8 +231,8 @@ def channel_actions(args, config):
             )
 
 
-def following_channels_actions(args, config):
-    """Run the video subcommand according to it's options."""
+def following_channels_command(args, config):
+    """Run the following channels subcommand."""
     channels = get_following_channels(args.channels_file)
 
     if not channels:
@@ -220,30 +250,36 @@ def following_channels_actions(args, config):
     data = []
     streams_titles = {}
 
-    with ProgressBar() as pb:
-        for channel in pb(channels):
-            pb.title = HTML(
-                f"<style bg='white' fg='black'>Checking for {channel['id']}...</style>"
+    def fetch_stream_data(channel: dict) -> None:
+        stream_data = extractors.extract_stream(channel["id"], args.verbosity)
+        if stream_data:
+            print_formatted_text(
+                HTML(
+                    f"<lime>[{len(data) + 1}]</lime> ({channel['name']}) "
+                    + "is <green><b>online</b></green>"
+                )
+            )
+            data.append(stream_data)
+            streams_titles.update({str(len(data)): channel["name"]})
+        elif not args.online:
+            print_formatted_text(
+                HTML(f"<red>[-]</red> ({channel['name']}) is <red><b>offline</b></red>")
             )
 
-            channel_stream_data = extractors.extract_stream(
-                channel["id"], args.verbosity
-            )
-            if channel_stream_data:
-                print_formatted_text(
-                    HTML(
-                        f"<lime>[{len(data) + 1}]</lime> ({channel['name']}) "
-                        + "is <green><b>online</b></green>"
-                    )
-                )
-                data.append(channel_stream_data)
-                streams_titles.update({str(len(data)): channel["name"]})
-            elif not args.online:
-                print_formatted_text(
-                    HTML(
-                        f"<red>[-]</red> ({channel['name']}) is <red><b>offline</b></red>"
-                    )
-                )
+    threads = {}
+    for channel in channels:
+        threads.update(
+            {channel["id"]: threading.Thread(target=fetch_stream_data, args=(channel,))}
+        )
+        threads[channel["id"]].daemon = True
+        threads[channel["id"]].start()
+
+    with ProgressBar(
+        title=HTML("<style bg='white' fg='black'>Checking for channels...</style>")
+    ) as pb:
+        for channel_id, thread in pb(threads.items()):
+            if thread.is_alive():
+                thread.join()
 
     if data:
         to_watch = tuple(
@@ -268,23 +304,38 @@ def following_channels_actions(args, config):
             play_media(args, to_watch_data)
 
 
-def play_media(args, data=None):
+def videos_command(args):
+    """Run the videos subcommand."""
+    data = []
+
+    def fetch_video_data(video_id: str) -> None:
+        data.append(extractors.extract_video(video_id, args.verbosity))
+
+    threads = {}
+    for video_id in args.videos_ids:
+        threads.update(
+            {video_id: threading.Thread(target=fetch_video_data, args=(video_id,))}
+        )
+        threads[video_id].daemon = True
+        threads[video_id].start()
+
+    with ProgressBar(
+        title=HTML("<style bg='white' fg='black'>Fetching videos data...</style>")
+    ) as pb:
+        for video_id, thread in pb(threads.items()):
+            if thread.is_alive():
+                thread.join()
+
+    if all([not x for x in data]):
+        # When all videos doesn't exist.
+        return None
+
+    play_media(args, data)
+
+
+def play_media(args, data):
     """Play a list of videos or streams."""
     import mpv
-
-    if data is None:
-        # When using the v command.
-        data = []
-        with ProgressBar() as pb:
-            for video_id in pb(args.videos_ids):
-                pb.title = HTML(
-                    f"<style bg='white' fg='black'>Fetching {video_id} data...</style>"
-                )
-                data.append(extractors.extract_video(video_id, args.verbosity))
-
-        if all([not x for x in data]):
-            # When all videos doesn't exist.
-            return None
 
     player = mpv.MPV(
         input_default_bindings=True,
@@ -406,8 +457,8 @@ def main():
     config = get_config(args.config_file)
 
     if args.subcommand == "c":
-        channel_actions(args, config)
+        channels_command(args, config)
     elif args.subcommand == "s":
-        following_channels_actions(args, config)
+        following_channels_command(args, config)
     elif args.subcommand == "v":
-        play_media(args)
+        videos_command(args)

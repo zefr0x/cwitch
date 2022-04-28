@@ -1,5 +1,4 @@
 """Use youtube_dl to extract videos and streams data from Twitch channels."""
-from __future__ import unicode_literals
 from typing import Optional
 
 # from urllib.parse import urljoin
@@ -21,7 +20,7 @@ class Logger(object):
         pass
 
     def warning(self, msg):
-        """Don't print warning messages."""
+        """Don't print warning messages, unless verbosity is enabled."""
         if self.verbosity:
             print(msg)
 

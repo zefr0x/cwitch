@@ -1,7 +1,7 @@
 """Parse the config and the channels list."""
+from typing import Optional, TextIO
 from configparser import ConfigParser, NoOptionError, NoSectionError
 from pathlib import Path
-from typing import Optional, TextIO
 
 from __init__ import prog_name
 

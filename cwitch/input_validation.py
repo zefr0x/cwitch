@@ -5,7 +5,7 @@ from prompt_toolkit.validation import Validator, ValidationError
 class NumbersListValidator(Validator):
     """Input validation when asking for the media indexes."""
 
-    def __init__(self, existing_media):
+    def __init__(self, existing_media: list):
         """Take a list of the existing media."""
         self.existing_media = existing_media
 
@@ -15,8 +15,6 @@ class NumbersListValidator(Validator):
         values = text.split()
 
         if text and not all([v.isdigit() for v in values]):
-            i = 0
-
             # Get index of first non numeric character.
             # We want to move the cursor here.
             for i, c in enumerate(text):
@@ -51,4 +49,6 @@ class MediaFormatsValidator(Validator):
         if not document.text:
             raise ValidationError(message="You should pick a format")
         elif document.text.strip() not in self.media_formats:
-            raise ValidationError(message=f"{document.text.strip()} is not a valid format")
+            raise ValidationError(
+                message=f"{document.text.strip()} is not a valid format"
+            )

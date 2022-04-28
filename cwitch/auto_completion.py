@@ -3,16 +3,16 @@ from prompt_toolkit.completion import Completer, Completion
 from prompt_toolkit import HTML
 
 
-class VideoTitlesCompleter(Completer):
-    """Auto completion for videos prompt when picking from a channel videos list."""
+class MediaTitlesCompleter(Completer):
+    """Auto completion for media prompt when picking from a streams/videos list."""
 
-    def __init__(self, videos_titles):
+    def __init__(self, media_titles: dict):
         """Take some data about the list."""
-        self.videos_titles = videos_titles
+        self.media_titles = media_titles
 
     def get_completions(self, document, complete_event):
         """Yield a completion for every item."""
-        for i, title in self.videos_titles.items():
+        for i, title in self.media_titles.items():
             if i not in document.text.split():
                 # If the value was already picked no need to show it in the tap completion.
                 yield Completion(
@@ -23,7 +23,7 @@ class VideoTitlesCompleter(Completer):
 class MediaFormatCompleter(Completer):
     """Auto completion for media formats prompt when picking a format."""
 
-    def __init__(self, media_formats):
+    def __init__(self, media_formats: list):
         """Take a formats list."""
         self.media_formats = media_formats
 

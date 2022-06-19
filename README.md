@@ -12,14 +12,16 @@ A CLI tool for watching Twitch live streams and videos with the help of [mpv](ht
 
 ## Installation
 
-### From pypi
+### From [pypi](https://pypi.org/project/cwitch/)
 
-To be added soon...
+```
+pip3 install cwitch
+```
 
 ### From github
 
 ```shell
-$ pip3 install https://github.com/zer0-x/cwitch/archive/refs/tags/v0.1.0.zip
+pip3 install https://github.com/zer0-x/cwitch/archive/refs/tags/v0.1.0.zip
 ```
 
 > > > You might need to use `python3 -m pip` instead of just `pip3`
@@ -29,7 +31,7 @@ $ pip3 install https://github.com/zer0-x/cwitch/archive/refs/tags/v0.1.0.zip
 Use the `--help` or `-h` option to see the help menu.
 
 ```shell
-$ cwitch -h
+cwitch -h
 ```
 
 There are three subcommands `c`, `s` and `v`. Choose a subcommand and then you can use the `-h` option to see the help menu for the subcommand.
@@ -59,3 +61,11 @@ max_videos_count=5
 > > There are no option other than this for now.
 
 > For both config and channels list there is an example file in the repo.
+
+## Todo
+- [ ] Display videos comments as subtitles.
+- [ ] Contact with youtube-dl if possible to improve the progress bar.
+- [ ] Support bash and zsh tap completions
+- [ ] Integrate some mpv userscript to easily controle the video quality on the fly, like mpv-youtube-quality.
+- [ ] Add some configurations for mpv caching and the streaming process.
+- [ ] Add a way to display more videos from a channel videos list, with a command line argument, and if it was possible, with an option after listing some videos to list another batch.

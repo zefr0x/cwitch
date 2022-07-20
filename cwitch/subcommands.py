@@ -55,7 +55,8 @@ def channels_command(args) -> list:
             data.append(
                 extractors.extract_channel_videos(
                     channel_id,
-                    config["playlist_fetching"]["max_videos_count"],
+                    args.max_list_length
+                    or config["playlist_fetching"]["max_videos_count"],
                     verbosity=args.verbosity,
                 )
             )

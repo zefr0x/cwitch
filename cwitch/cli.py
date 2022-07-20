@@ -65,6 +65,14 @@ def get_parser() -> argparse.ArgumentParser:
     )
 
     channel_parser.add_argument(
+        "-n",
+        "--max-list-length",
+        type=int,
+        metavar="integer",
+        help="Maximum number of listed videos",
+    )
+
+    channel_parser.add_argument(
         "-q",
         "--quality",
         type=str,

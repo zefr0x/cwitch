@@ -1,5 +1,9 @@
 # cwitch
 
+[![Downloads](https://static.pepy.tech/personalized-badge/cwitch?period=total&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads)](https://pepy.tech/project/cwitch)
+[![Downloads](https://static.pepy.tech/personalized-badge/cwitch?period=month&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads/month)](https://pepy.tech/project/cwitch)
+[![Downloads](https://static.pepy.tech/personalized-badge/cwitch?period=week&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads/week)](https://pepy.tech/project/cwitch)
+
 A CLI tool for watching Twitch live streams and videos with the help of [mpv](https://mpv.io/) and [youtube-dl](https://youtube-dl.org/).
 
 ## Features

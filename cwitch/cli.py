@@ -39,15 +39,14 @@ def get_parser() -> argparse.ArgumentParser:
     channel_parser = subparsers.add_parser(
         "c", help="to play a live stream or search in the previous videos of a channel."
     )
-    # TODO Auto completion for channels names from the channels list file.
+    # TODO Tap auto completion for channel name from the channels list file.
     channel_parser.add_argument(
-        "channels_ids",
+        "channel_id",
         type=str,
-        nargs="+",
         metavar="CHANNEL-ID",
         help="the channel ID.",
     )
-    # Tow mutually exclusive flags for different actions
+    # Two mutually exclusive flags for different actions
     group1 = channel_parser.add_mutually_exclusive_group(required=True)
     group1.add_argument(
         "-s",
@@ -56,7 +55,6 @@ def get_parser() -> argparse.ArgumentParser:
         help="play the live stream if there was.",
     )
     # TODO Add filter, sort, reverse and random options.
-    # TODO accept a number on the list-videos option
     group1.add_argument(
         "-l",
         "--list-videos",
@@ -134,7 +132,7 @@ def get_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def play_media(args: argparse.Namespace, medias_data: list) -> None:
+def play_media(args: argparse.Namespace, medias_data: tuple) -> None:
     """Play a list of videos or streams."""
     from mpv import MPV
 
@@ -207,7 +205,11 @@ def main() -> int:
         )
         if displayed_videos_count:
             while displayed_videos_count:
-                sub_media_data, displayed_videos_count, extra_count = subcommands.channels_command(
+                (
+                    sub_media_data,
+                    displayed_videos_count,
+                    extra_count,
+                ) = subcommands.channels_command(
                     args, displayed_videos_count, extra_count
                 )
                 if media_data:
@@ -222,7 +224,7 @@ def main() -> int:
         media_data = subcommands.videos_command(args)
 
     if media_data:
-        play_media(args, media_data)
+        play_media(args, tuple(media_data))
     return 1
 
 

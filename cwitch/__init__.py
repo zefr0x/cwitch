@@ -1,7 +1,7 @@
 """cwitch is a CLI tool to watch Twtich streams and videos."""
 # TODO Provide a python module.
 prog_name = "cwitch"
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __author__ = "zer0-x"
 __license__ = "GPL-3.0"
 

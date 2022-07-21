@@ -72,4 +72,3 @@ max_videos_count=5
 - [ ] Support bash and zsh tap completions
 - [ ] Integrate some mpv userscript to easily controle the video quality on the fly, like mpv-youtube-quality.
 - [ ] Add some configurations for mpv caching and the streaming process.
-- [ ] Add a way to display more videos from a channel videos list, with a command line argument, and if it was possible, with an option after listing some videos to list another batch.

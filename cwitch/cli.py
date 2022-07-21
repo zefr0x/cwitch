@@ -186,7 +186,7 @@ def play_media(args: argparse.Namespace, medias_data: list) -> None:
     player.wait_for_shutdown()
 
 
-def main() -> None:
+def main() -> int:
     """Run cwitch from the command line."""
     parser = get_parser()
     args = parser.parse_args()
@@ -196,13 +196,26 @@ def main() -> None:
 
     if args.version:
         print(f"{prog_name} {__version__}")
-        exit(0)
+        return 0
     elif not args.subcommand:
         parser.print_help()
-        exit(0)
+        return 0
 
     if args.subcommand == "c":
-        media_data = subcommands.channels_command(args)
+        media_data, displayed_videos_count, extra_count = subcommands.channels_command(
+            args
+        )
+        if displayed_videos_count:
+            while displayed_videos_count:
+                sub_media_data, displayed_videos_count, extra_count = subcommands.channels_command(
+                    args, displayed_videos_count, extra_count
+                )
+                if media_data:
+                    media_data.extend(sub_media_data or [])
+                else:
+                    media_data = sub_media_data
+        elif displayed_videos_count == 0:
+            print_formatted_text(HTML("<red>Error</red>: There is no more videos."))
     elif args.subcommand == "s":
         media_data = subcommands.following_channels_command(args)
     elif args.subcommand == "v":
@@ -210,7 +223,8 @@ def main() -> None:
 
     if media_data:
         play_media(args, media_data)
+    return 1
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

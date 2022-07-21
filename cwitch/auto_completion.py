@@ -19,6 +19,12 @@ class MediaTitlesCompleter(Completer):
                     i, display=HTML(f"<b>[{i}]</b> {title}"), start_position=0
                 )
 
+        yield Completion(
+            "x",
+            display=HTML("<b>x[n]</b> Extra videos (e.g. 'x2' or 'x13')."),
+            start_position=0,
+        )
+
 
 class MediaFormatCompleter(Completer):
     """Auto completion for media formats prompt when picking a format."""

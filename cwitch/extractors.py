@@ -35,6 +35,7 @@ class Logger(object):
 def extract_channel_videos(
     channel_name: str,
     count: int,
+    playlist_start: int,
     filter: str = "all",
     sort_method: str = "time",
     reverse: bool = False,
@@ -46,8 +47,8 @@ def extract_channel_videos(
         "simulate": True,
         "quiet": True,
         "logger": Logger(verbosity),
-        "playliststart": 1,
-        "playlistend": count,
+        "playliststart": playlist_start,
+        "playlistend": playlist_start + count - 1,
         "playlistreverse": reverse,
         "playlistrandom": random,
     }

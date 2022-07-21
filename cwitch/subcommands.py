@@ -1,5 +1,5 @@
 """CLI subcommands functions."""
-from typing import Optional
+from typing import Optional, Tuple
 import threading
 
 from prompt_toolkit import print_formatted_text, HTML
@@ -11,8 +11,11 @@ from . import prompts
 from .config import get_config, get_following_channels
 
 
-def channels_command(args) -> list:
+def channels_command(
+    args, playlist_start: int = 0, extra_count: Optional[int] = None
+) -> Tuple[Optional[list], Optional[int], Optional[int]]:
     """Run the channel subcommand."""
+    # TODO Remove multiple channel support.
     if args.stream:
         data = []
 
@@ -45,7 +48,7 @@ def channels_command(args) -> list:
                     thread.join()
 
         if data:
-            return data
+            return data, None, None
 
     elif args.list_videos:
         config = get_config(args.config_file)
@@ -55,8 +58,10 @@ def channels_command(args) -> list:
             data.append(
                 extractors.extract_channel_videos(
                     channel_id,
-                    args.max_list_length
+                    extra_count
+                    or args.max_list_length
                     or config["playlist_fetching"]["max_videos_count"],
+                    playlist_start + 1,
                     verbosity=args.verbosity,
                 )
             )
@@ -87,15 +92,22 @@ def channels_command(args) -> list:
                 video_titles.update({str(video["playlist_index"]): video["title"]})
                 printers.print_media_data(args, video)
 
-            videos_to_watch = prompts.pick_videos_prompt(video_titles)
+            videos_to_watch, show_extra, extra_count = prompts.pick_videos_prompt(
+                video_titles
+            )
 
             to_watch_data += [
-                x for i, x in enumerate(sub_data["entries"]) if i + 1 in videos_to_watch
+                x
+                for i, x in enumerate(sub_data["entries"])
+                if i + playlist_start + 1 in videos_to_watch
             ]
 
-        if to_watch_data:
-            return to_watch_data
-    return []
+        if show_extra:
+            return to_watch_data, len(sub_data["entries"]) + playlist_start, extra_count
+        elif to_watch_data:
+            return to_watch_data, None, None
+
+    return None, None, None
 
 
 def following_channels_command(args) -> Optional[list]:

@@ -143,7 +143,7 @@ def following_channels_command(args) -> Optional[list]:
                 )
             )
             streams_data.append(stream_data)
-            streams_titles.update({str(len(stream_data)): channel["name"]})
+            streams_titles.update({str(len(streams_data)): channel["name"]})
         elif not args.online:
             print_formatted_text(
                 HTML(f"<red>[-]</red> ({channel['name']}) is <red><b>offline</b></red>")
@@ -178,7 +178,7 @@ def following_channels_command(args) -> Optional[list]:
         to_watch_data = [d for i, d in enumerate(streams_data) if i + 1 in to_watch]
         if to_watch_data:
             return to_watch_data
-    return []
+    return None
 
 
 def videos_command(args) -> Optional[list]:

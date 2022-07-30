@@ -5,7 +5,6 @@ import argparse
 from prompt_toolkit import print_formatted_text, HTML
 
 from .__init__ import __version__, prog_name
-from . import subcommands
 from . import printers
 from . import prompts
 
@@ -199,10 +198,14 @@ def main() -> int:
         parser.print_help()
         return 0
 
+    from . import subcommands
+
     if args.subcommand == "c":
-        media_data, displayed_videos_count, extra_count = subcommands.channels_command(
-            args
-        )
+        (
+            media_data,
+            displayed_videos_count,
+            extra_count,
+        ) = subcommands.channels_command(args)
         if displayed_videos_count:
             while displayed_videos_count:
                 (

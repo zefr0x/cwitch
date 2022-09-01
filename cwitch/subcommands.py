@@ -95,11 +95,14 @@ def channels_command(
             video_titles
         )
 
-        to_watch_data = [
-            x
-            for i, x in enumerate(videos_data["entries"])
+        unsorted_to_watch_data = {
+            i: d
+            for i, d in enumerate(videos_data["entries"])
             if i + playlist_start + 1 in videos_to_watch
-        ]
+        }
+
+        # Sort them according to the selection order.
+        to_watch_data = [unsorted_to_watch_data[i - (1 + playlist_start)] for i in videos_to_watch]
 
         if show_extra:
             return (
@@ -175,7 +178,15 @@ def following_channels_command(args) -> Optional[list]:
     if streams_data:
         to_watch = prompts.pick_streams_prompt(streams_titles)
 
-        to_watch_data = [d for i, d in enumerate(streams_data) if i + 1 in to_watch]
+        unsorted_to_watch_data = {
+            i: d
+            for i, d in enumerate(streams_data)
+            if i + 1 in to_watch
+        }
+
+        # Sort them according to the selection order.
+        to_watch_data = [unsorted_to_watch_data[i - 1] for i in to_watch]
+
         if to_watch_data:
             return to_watch_data
     return None

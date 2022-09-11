@@ -133,7 +133,7 @@ def get_parser() -> argparse.ArgumentParser:
 
 def play_media(args: argparse.Namespace, medias_data: tuple) -> None:
     """Play a list of videos or streams."""
-    from mpv import MPV
+    from mpv import MPV, ShutdownError
 
     player = MPV(
         input_default_bindings=True,
@@ -175,12 +175,17 @@ def play_media(args: argparse.Namespace, medias_data: tuple) -> None:
         )
 
     player.playlist_pos = 0
+    player.loop_playlist = "inf"
 
     player.wait_until_playing()
     if args.verbosity:
         print_formatted_text(HTML("<orange>#</orange>"), player.playlist)
 
-    player.wait_for_shutdown()
+    try:
+        while True:
+            player.wait_for_playback()
+    except ShutdownError:
+        pass
 
 
 def main() -> int:

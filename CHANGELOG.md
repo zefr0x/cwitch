@@ -1,3 +1,11 @@
+# 0.2.1
+## Changed
+- Sort videos/streams according to user selection order.
+- Loop in playlist.
+## Fixed
+- Decreace excution time when there is no need for importing youtube-dl.
+- Better handle exiting.
+
 # 0.2.0
 ## Added
 - Respect XDG base directory specification.

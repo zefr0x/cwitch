@@ -1,10 +1,9 @@
 # cwitch
 
-[![Downloads](https://static.pepy.tech/personalized-badge/cwitch?period=total&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads)](https://pepy.tech/project/cwitch)
-[![Downloads](https://static.pepy.tech/personalized-badge/cwitch?period=month&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads/month)](https://pepy.tech/project/cwitch)
-[![Downloads](https://static.pepy.tech/personalized-badge/cwitch?period=week&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads/week)](https://pepy.tech/project/cwitch)
+[![AUR votes](https://img.shields.io/aur/votes/cwitch?label=AUR%20votes)](https://aur.archlinux.org/packages/cwitch)
 
-![PyPI](https://img.shields.io/pypi/v/cwitch)
+[![AUR version](https://img.shields.io/aur/version/cwitch?label=AUR)](https://aur.archlinux.org/packages/cwitch)
+[![PyPI](https://img.shields.io/pypi/v/cwitch)](https://pypi.org/project/cwitch/)
 
 A CLI tool for watching Twitch live streams and videos with the help of [mpv](https://mpv.io/) and [youtube-dl](https://youtube-dl.org/).
 
@@ -18,10 +17,28 @@ A CLI tool for watching Twitch live streams and videos with the help of [mpv](ht
 
 ## Installation
 
-### From [pypi](https://pypi.org/project/cwitch/)
+### [pypi](https://pypi.org/project/cwitch/)
+
+[![Downloads](https://static.pepy.tech/personalized-badge/cwitch?period=total&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads)](https://pepy.tech/project/cwitch)
+[![Downloads](https://static.pepy.tech/personalized-badge/cwitch?period=month&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads/month)](https://pepy.tech/project/cwitch)
+[![Downloads](https://static.pepy.tech/personalized-badge/cwitch?period=week&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads/week)](https://pepy.tech/project/cwitch)
 
 ```
 pip3 install cwitch
+```
+
+### [AUR](https://aur.archlinux.org/packages/cwitch)
+
+[![AUR last modified](https://img.shields.io/aur/last-modified/cwitch)](https://aur.archlinux.org/cgit/aur.git/log/?h=cwitch)
+
+#### Using paru
+```shell
+paru -Sa cwitch
+```
+
+#### Using yay
+```shell
+yay -Sa cwitch
 ```
 
 ### From github

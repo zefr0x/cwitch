@@ -1,6 +1,9 @@
 """Setup file for the library."""
-from setuptools import setup, find_packages
 from pathlib import Path
+
+from pkg_resources import parse_requirements
+from setuptools import find_packages
+from setuptools import setup
 
 from cwitch import __about__ as about
 
@@ -13,6 +16,11 @@ ISSUES = "https://github.com/zer0-x/cwitch/issues"
 CHANGELOG = "https://github.com/zer0-x/cwitch/blob/main/CHANGELOG.md"
 
 DESCRIPTION = "A CLI tool to watch Twitch live streams and videos."
+
+with open("requirements/requirements.in", "r") as requirements_in:
+    dependencies = [
+        str(requirement) for requirement in parse_requirements(requirements_in)
+    ]
 
 setup(
     name=about.app_name,
@@ -28,7 +36,7 @@ setup(
         "Changelog": CHANGELOG,
     },
     packages=find_packages(),
-    install_requires=["youtube-dl", "python-mpv", "prompt-toolkit"],
+    install_requires=dependencies,
     entry_points={"console_scripts": [f"{about.app_name} = cwitch.cli:main"]},
     keywords=["twitch", "mpv", "youtube-dl", "stream", "cli", "live", "video"],
     classifiers=[

@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 from pathlib import Path
 
-from cwitch import prog_name, __version__, __author__, __license__
+from cwitch import __about__ as about
 
 HERE = Path(__file__).parent
 
@@ -15,10 +15,10 @@ CHANGELOG = "https://github.com/zer0-x/cwitch/blob/main/CHANGELOG.md"
 DESCRIPTION = "A CLI tool to watch Twitch live streams and videos."
 
 setup(
-    name=prog_name,
-    version=__version__,
-    author=__author__,
-    license=__license__,
+    name=about.app_name,
+    version=about.version,
+    author=about.author,
+    license=about.license,
     description=DESCRIPTION,
     long_description_content_type="text/markdown",
     long_description=README,
@@ -29,7 +29,7 @@ setup(
     },
     packages=find_packages(),
     install_requires=["youtube-dl", "python-mpv", "prompt-toolkit"],
-    entry_points={"console_scripts": [f"{prog_name} = cwitch.cli:main"]},
+    entry_points={"console_scripts": [f"{about.app_name} = cwitch.cli:main"]},
     keywords=["twitch", "mpv", "youtube-dl", "stream", "cli", "live", "video"],
     classifiers=[
         "Environment :: Console",

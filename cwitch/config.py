@@ -4,7 +4,7 @@ from configparser import ConfigParser, NoOptionError, NoSectionError
 from pathlib import Path
 from os import environ
 
-from .__init__ import prog_name
+from . import __about__ as about
 
 
 if environ.get("XDG_CONFIG_HOME"):
@@ -21,13 +21,12 @@ def get_config(config_file: Optional[TextIO] = None) -> dict:
     try:
         if config_file is None:
             config_file = open(
-                Path.joinpath(xdg_config_home, prog_name, "config.ini"), "r"
+                Path.joinpath(xdg_config_home, about.app_name, "config.ini"), "r"
             )
 
         config.read_file(config_file)
     except FileNotFoundError:
         pass
-
     options = {"playlist_fetching": {"max_videos_count": 5}}
 
     try:
@@ -47,7 +46,7 @@ def get_following_channels(channels_file: Optional[TextIO] = None) -> tuple:
     try:
         if channels_file is None:
             channels_file = open(
-                Path.joinpath(xdg_config_home, prog_name, "channels.ini"), "r"
+                Path.joinpath(xdg_config_home, about.app_name, "channels.ini"), "r"
             )
 
         channels.read_file(channels_file)

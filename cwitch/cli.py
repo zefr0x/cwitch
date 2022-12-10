@@ -4,7 +4,7 @@ import argparse
 # from mpv import MPV
 from prompt_toolkit import print_formatted_text, HTML
 
-from .__init__ import __version__, prog_name
+from . import __about__ as about
 from . import printers
 from . import prompts
 
@@ -12,9 +12,9 @@ from . import prompts
 def get_parser() -> argparse.ArgumentParser:
     """Return a parser object."""
     parser = argparse.ArgumentParser(
-        prog=prog_name,
+        prog=about.app_name,
         description="watch Twitch live streams and videos and track channels' activities.",
-        # epilog="v" + __version__,
+        # epilog="v" + about.version,
     )
 
     parser.add_argument(
@@ -139,7 +139,7 @@ def play_media(args: argparse.Namespace, medias_data: tuple) -> None:
         input_default_bindings=True,
         input_vo_keyboard=True,
         osc=True,
-        title=prog_name,
+        title=about.app_name,
     )
 
     # script_dir = str(Path.home())+'/.config/mpv/scripts/'
@@ -197,7 +197,7 @@ def main() -> int:
         print_formatted_text(HTML("<orange>#</orange>"), args)
 
     if args.version:
-        print(f"{prog_name} {__version__}")
+        print(f"{about.app_name} {about.version}")
         return 0
     elif not args.subcommand:
         parser.print_help()

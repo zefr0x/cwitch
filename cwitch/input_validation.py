@@ -1,17 +1,19 @@
 """Input validation classes for prompt-toolkit prompts."""
 from typing import KeysView
 
-from prompt_toolkit.validation import Validator, ValidationError
+from prompt_toolkit.document import Document
+from prompt_toolkit.validation import ValidationError
+from prompt_toolkit.validation import Validator
 
 
 class NumbersListValidator(Validator):
     """Input validation when asking for the media indexes."""
 
-    def __init__(self, existing_media: KeysView):
+    def __init__(self, existing_media: KeysView) -> None:
         """Take a list of the existing media."""
         self.existing_media = existing_media
 
-    def validate(self, document):
+    def validate(self, document: Document) -> None:
         """Check if the input contains only numbers from the media list."""
         text = document.text
         values = text.split()
@@ -24,13 +26,13 @@ class NumbersListValidator(Validator):
         ):
             # Get index of first non numeric character.
             # We want to move the cursor here.
-            for i, c in enumerate(text):
+            for _i, c in enumerate(text):
                 if not c.isdigit() and c not in (" ", "x"):
                     break
 
             raise ValidationError(
                 message="This input contains not allowed non-numeric characters",
-                cursor_position=i,
+                cursor_position=_i,
             )
         elif text and not all(
             [
@@ -54,11 +56,11 @@ class NumbersListValidator(Validator):
 class MediaFormatsValidator(Validator):
     """Input validation when asking for the media format."""
 
-    def __init__(self, media_formats):
+    def __init__(self, media_formats: list) -> None:
         """Take a list of the available formats."""
         self.media_formats = media_formats
 
-    def validate(self, document):
+    def validate(self, document: Document) -> None:
         """Check if the format is valid."""
         if not document.text:
             raise ValidationError(message="You should pick a format")

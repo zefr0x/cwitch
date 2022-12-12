@@ -1,8 +1,11 @@
 """Data printers."""
-from prompt_toolkit import print_formatted_text, HTML
+from argparse import Namespace
+
+from prompt_toolkit import HTML
+from prompt_toolkit import print_formatted_text
 
 
-def print_media_data(args, media) -> None:
+def print_media_data(args: Namespace, media: dict) -> None:
     """Print media data in a readable way."""
     from datetime import datetime, timedelta
 

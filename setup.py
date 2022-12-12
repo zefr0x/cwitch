@@ -23,10 +23,10 @@ with open("requirements/requirements.in", "r") as requirements_in:
     ]
 
 setup(
-    name=about.app_name,
-    version=about.version,
-    author=about.author,
-    license=about.license,
+    name=about.APP_NAME,
+    version=about.VERSION,
+    author=about.AUTHOR,
+    license=about.LICENSE,
     description=DESCRIPTION,
     long_description_content_type="text/markdown",
     long_description=README,
@@ -37,7 +37,7 @@ setup(
     },
     packages=find_packages(),
     install_requires=dependencies,
-    entry_points={"console_scripts": [f"{about.app_name} = cwitch.cli:main"]},
+    entry_points={"console_scripts": [f"{about.APP_NAME} = cwitch.cli:main"]},
     keywords=["twitch", "mpv", "youtube-dl", "stream", "cli", "live", "video"],
     classifiers=[
         "Environment :: Console",

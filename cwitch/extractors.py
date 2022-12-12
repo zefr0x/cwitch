@@ -1,9 +1,9 @@
 """Use youtube_dl to extract videos and streams data from Twitch channels."""
 from typing import Optional
 
-# from urllib.parse import urljoin
-
 import youtube_dl
+
+# from urllib.parse import urljoin
 
 BASE_URL = "https://www.twitch.tv"
 
@@ -11,20 +11,20 @@ BASE_URL = "https://www.twitch.tv"
 class Logger(object):
     """Logger for youtube-dl."""
 
-    def __init__(self, verbosity):
+    def __init__(self, verbosity: bool) -> None:
         """Take the verbosity mode."""
         self.verbosity = verbosity
 
-    def debug(self, msg):
+    def debug(self, msg: str) -> None:
         """Don't print debug messages."""
         pass
 
-    def warning(self, msg):
+    def warning(self, msg: str) -> None:
         """Don't print warning messages, unless verbosity is enabled."""
         if self.verbosity:
             print(msg)
 
-    def error(self, msg):
+    def error(self, msg: str) -> None:
         """Handle error messages."""
         if msg.endswith(" does not exist"):
             print(msg)
@@ -36,7 +36,7 @@ def extract_channel_videos(
     channel_name: str,
     count: int,
     playlist_start: int,
-    filter: str = "all",
+    search_filter: str = "all",
     sort_method: str = "time",
     reverse: bool = False,
     random: bool = False,
@@ -55,7 +55,7 @@ def extract_channel_videos(
 
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         return ydl.extract_info(
-            f"{BASE_URL}/{channel_name}/videos?filter={filter}&sort={sort_method}"
+            f"{BASE_URL}/{channel_name}/videos?filter={search_filter}&sort={sort_method}"
         )
 
 

@@ -1,6 +1,6 @@
 """Some information about the package."""
 
-app_name = "cwitch"
-version = "0.2.1"
-author = "zer0-x"
-license = "GPL-3.0"
+APP_NAME = "cwitch"
+VERSION = "0.2.1"
+AUTHOR = "zer0-x"
+LICENSE = "GPL-3.0"

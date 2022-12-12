@@ -1,25 +1,30 @@
 """CLI subcommands functions."""
-from typing import Optional, Tuple
 import threading
+from argparse import Namespace
+from typing import Generator
+from typing import Optional
+from typing import Tuple
 
-from prompt_toolkit import print_formatted_text, HTML
+from prompt_toolkit import HTML
+from prompt_toolkit import print_formatted_text
 from prompt_toolkit.shortcuts import ProgressBar
 from prompt_toolkit.shortcuts.progress_bar import formatters
 
 from . import extractors
 from . import printers
 from . import prompts
-from .config import get_config, get_following_channels
+from .config import get_config
+from .config import get_following_channels
 
 
-def infinity():
+def infinity() -> Generator:
     """Infinity function to be used in progress bars."""
     while True:
         yield None
 
 
 def channels_command(
-    args, playlist_start: int = 0, extra_count: Optional[int] = None
+    args: Namespace, playlist_start: int = 0, extra_count: Optional[int] = None
 ) -> Tuple[Optional[list], Optional[int], Optional[int]]:
     """Run the channel subcommand."""
     if args.stream:
@@ -55,7 +60,7 @@ def channels_command(
 
     elif args.list_videos:
         config = get_config(args.config_file)
-        videos_data = dict()
+        videos_data = {}
 
         def fetch_channel_videos_list(channel_id: str) -> None:
             nonlocal videos_data
@@ -102,7 +107,9 @@ def channels_command(
         }
 
         # Sort them according to the selection order.
-        to_watch_data = [unsorted_to_watch_data[i - (1 + playlist_start)] for i in videos_to_watch]
+        to_watch_data = [
+            unsorted_to_watch_data[i - (1 + playlist_start)] for i in videos_to_watch
+        ]
 
         if show_extra:
             return (
@@ -116,7 +123,7 @@ def channels_command(
     return None, None, None
 
 
-def following_channels_command(args) -> Optional[list]:
+def following_channels_command(args: Namespace) -> Optional[list]:
     """Run the following channels subcommand."""
     channels = get_following_channels(args.channels_file)
 
@@ -179,9 +186,7 @@ def following_channels_command(args) -> Optional[list]:
         to_watch = prompts.pick_streams_prompt(streams_titles)
 
         unsorted_to_watch_data = {
-            i: d
-            for i, d in enumerate(streams_data)
-            if i + 1 in to_watch
+            i: d for i, d in enumerate(streams_data) if i + 1 in to_watch
         }
 
         # Sort them according to the selection order.
@@ -192,7 +197,7 @@ def following_channels_command(args) -> Optional[list]:
     return None
 
 
-def videos_command(args) -> Optional[list]:
+def videos_command(args: Namespace) -> Optional[list]:
     """Run the videos subcommand."""
     videos_data = []
 
@@ -214,7 +219,7 @@ def videos_command(args) -> Optional[list]:
             formatters.Bar(start="[", end="]", sym_a="=", sym_b="=", sym_c="-"),
         ],
     ) as pb:
-        for video_id, thread in pb(threads.items()):
+        for _video_id, thread in pb(threads.items()):
             if thread.is_alive():
                 thread.join()
             pb.title = ""

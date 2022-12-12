@@ -1,7 +1,8 @@
 """CLI prompts."""
 from typing import Optional
 
-from prompt_toolkit import prompt, HTML
+from prompt_toolkit import HTML
+from prompt_toolkit import prompt
 
 from . import auto_completion
 from . import input_validation
@@ -25,7 +26,9 @@ def formats_prompt(media_formats: list) -> int:
     )
 
 
-def pick_videos_prompt(video_titles: dict) -> tuple[tuple[int, ...], bool, Optional[int]]:
+def pick_videos_prompt(
+    video_titles: dict,
+) -> tuple[tuple[int, ...], bool, Optional[int]]:
     """Prompt to pick a video from a videos list."""
     results = prompt(
         HTML(

@@ -1,20 +1,22 @@
 """Command line interface for cwitch."""
 import argparse
 
-# from mpv import MPV
-from prompt_toolkit import print_formatted_text, HTML
+from prompt_toolkit import HTML
+from prompt_toolkit import print_formatted_text
 
 from . import __about__ as about
 from . import printers
 from . import prompts
 
+# from mpv import MPV
+
 
 def get_parser() -> argparse.ArgumentParser:
     """Return a parser object."""
     parser = argparse.ArgumentParser(
-        prog=about.app_name,
+        prog=about.APP_NAME,
         description="watch Twitch live streams and videos and track channels' activities.",
-        # epilog="v" + about.version,
+        # epilog="v" + about.VERSION,
     )
 
     parser.add_argument(
@@ -139,7 +141,7 @@ def play_media(args: argparse.Namespace, medias_data: tuple) -> None:
         input_default_bindings=True,
         input_vo_keyboard=True,
         osc=True,
-        title=about.app_name,
+        title=about.APP_NAME,
     )
 
     # script_dir = str(Path.home())+'/.config/mpv/scripts/'
@@ -197,7 +199,7 @@ def main() -> int:
         print_formatted_text(HTML("<orange>#</orange>"), args)
 
     if args.version:
-        print(f"{about.app_name} {about.version}")
+        print(f"{about.APP_NAME} {about.VERSION}")
         return 0
     elif not args.subcommand:
         parser.print_help()

@@ -44,7 +44,7 @@ yay -Sa cwitch
 ### From github
 
 ```shell
-pip3 install https://github.com/zer0-x/cwitch/archive/refs/tags/v0.1.0.zip
+pip3 install https://github.com/zer0-x/cwitch/archive/refs/tags/v0.2.1.zip
 ```
 
 > > > You might need to use `python3 -m pip` instead of just `pip3`

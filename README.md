@@ -3,7 +3,6 @@
 [![AUR votes](https://img.shields.io/aur/votes/cwitch?label=AUR%20votes)](https://aur.archlinux.org/packages/cwitch)
 
 [![AUR version](https://img.shields.io/aur/version/cwitch?label=AUR)](https://aur.archlinux.org/packages/cwitch)
-[![PyPI](https://img.shields.io/pypi/v/cwitch)](https://pypi.org/project/cwitch/)
 
 A CLI tool for watching Twitch live streams and videos with the help of [mpv](https://mpv.io/) and [youtube-dl](https://youtube-dl.org/).
 
@@ -16,16 +15,6 @@ A CLI tool for watching Twitch live streams and videos with the help of [mpv](ht
 -   Select a media format (e.g. 1080p60, 480p, Audio_Only) for every live stream or video you want to watch.
 
 ## Installation
-
-### [pypi](https://pypi.org/project/cwitch/)
-
-[![Downloads](https://static.pepy.tech/personalized-badge/cwitch?period=total&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads)](https://pepy.tech/project/cwitch)
-[![Downloads](https://static.pepy.tech/personalized-badge/cwitch?period=month&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads/month)](https://pepy.tech/project/cwitch)
-[![Downloads](https://static.pepy.tech/personalized-badge/cwitch?period=week&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads/week)](https://pepy.tech/project/cwitch)
-
-```
-pip3 install cwitch
-```
 
 ### [AUR](https://aur.archlinux.org/packages/cwitch)
 
@@ -44,10 +33,10 @@ yay -Sa cwitch
 ### From github
 
 ```shell
-pip3 install https://github.com/zer0-x/cwitch/archive/refs/tags/v0.2.1.zip
+pip install https://github.com/zer0-x/cwitch/archive/refs/tags/v0.2.1.zip
 ```
 
-> > > You might need to use `python3 -m pip` instead of just `pip3`
+> > > You might need to use `pip3` or `python3 -m pip` instead of just `pip`
 
 ## Usage
 

@@ -38,7 +38,16 @@ setup(
     packages=find_packages(),
     install_requires=dependencies,
     entry_points={"console_scripts": [f"{about.APP_NAME} = cwitch.cli:main"]},
-    keywords=["twitch", "mpv", "youtube-dl", "stream", "cli", "live", "video"],
+    keywords=[
+        "twitch",
+        "mpv",
+        "youtube-dl",
+        "yt-dlp",
+        "stream",
+        "cli",
+        "live",
+        "video",
+    ],
     classifiers=[
         "Environment :: Console",
         "Programming Language :: Python :: 3",

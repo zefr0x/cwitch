@@ -1,7 +1,7 @@
-"""Use youtube_dl to extract videos and streams data from Twitch channels."""
+"""Use yt-dlp to extract videos and streams data from Twitch channels."""
 from typing import Optional
 
-import youtube_dl
+import yt_dlp
 
 # from urllib.parse import urljoin
 
@@ -9,7 +9,7 @@ BASE_URL = "https://www.twitch.tv"
 
 
 class Logger(object):
-    """Logger for youtube-dl."""
+    """Logger for yt-dlp."""
 
     def __init__(self, verbosity: bool) -> None:
         """Take the verbosity mode."""
@@ -53,7 +53,7 @@ def extract_channel_videos(
         "playlistrandom": random,
     }
 
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         return ydl.extract_info(
             f"{BASE_URL}/{channel_name}/videos?filter={search_filter}&sort={sort_method}"
         )
@@ -68,10 +68,10 @@ def extract_stream(channel_name: str, verbosity: bool = False) -> Optional[dict]
         "logger": Logger(verbosity),
     }
 
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         try:
             return ydl.extract_info(f"{BASE_URL}/{channel_name}")
-        except youtube_dl.utils.DownloadError:
+        except yt_dlp.utils.DownloadError:
             return None
 
 
@@ -84,5 +84,5 @@ def extract_video(video_id: str, verbosity: bool = False) -> dict:
         "logger": Logger(verbosity),
     }
 
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         return ydl.extract_info(f"{BASE_URL}/videos/{video_id}")

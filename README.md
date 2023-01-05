@@ -4,7 +4,7 @@
 
 [![AUR version](https://img.shields.io/aur/version/cwitch?label=AUR)](https://aur.archlinux.org/packages/cwitch)
 
-A CLI tool for watching Twitch live streams and videos with the help of [mpv](https://mpv.io/) and [youtube-dl](https://youtube-dl.org/).
+A CLI tool for watching Twitch live streams and videos with the help of [mpv](https://mpv.io/) and [yt-dlp](https://github.com/yt-dlp/yt-dlp).
 
 ## Features
 
@@ -76,7 +76,7 @@ max_videos_count=5
 
 ## Todo
 - [ ] Display videos comments as subtitles.
-- [ ] Contact with youtube-dl if possible to improve the progress bar.
+- [ ] Contact with yt-dlp if possible to improve the progress bar.
 - [ ] Support bash and zsh tap completions
 - [ ] Integrate some mpv userscript to easily controle the video quality on the fly, like mpv-youtube-quality.
 - [ ] Add some configurations for mpv caching and the streaming process.

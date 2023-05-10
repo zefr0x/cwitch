@@ -224,7 +224,7 @@ def videos_command(args: Namespace) -> Optional[list]:
                 thread.join()
             pb.title = ""
 
-    if all([not x for x in videos_data]):
+    if all((not x for x in videos_data)):
         # When all videos doesn't exist.
         return None
 

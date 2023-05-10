@@ -19,10 +19,10 @@ class NumbersListValidator(Validator):
         values = text.split()
 
         if text and not all(
-            [
+            (
                 v.isdigit() or (v[0] == "x" and (v[1:].isdigit() or v[1:] == ""))
                 for v in values
-            ]
+            )
         ):
             # Get index of first non numeric character.
             # We want to move the cursor here.
@@ -35,11 +35,11 @@ class NumbersListValidator(Validator):
                 cursor_position=_i,
             )
         elif text and not all(
-            [
+            (
                 v in self.existing_media
                 or (v[0] == "x" and (v[1:].isdigit()) or v[1:] == "")
                 for v in values
-            ]
+            )
         ):
             # Get index of first non existing media.
             # We want to move the cursor here.

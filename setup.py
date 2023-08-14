@@ -11,9 +11,9 @@ HERE = Path(__file__).parent
 
 README = (HERE / "README.md").read_text()
 
-URL = "https://github.com/zer0-x/cwitch"
-ISSUES = "https://github.com/zer0-x/cwitch/issues"
-CHANGELOG = "https://github.com/zer0-x/cwitch/blob/main/CHANGELOG.md"
+URL = "https://github.com/zefr0x/cwitch"
+ISSUES = "https://github.com/zefr0x/cwitch/issues"
+CHANGELOG = "https://github.com/zefr0x/cwitch/blob/main/CHANGELOG.md"
 
 DESCRIPTION = "A CLI tool to watch Twitch live streams and videos."
 

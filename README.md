@@ -33,7 +33,7 @@ yay -Sa cwitch
 ### From github
 
 ```shell
-pip install https://github.com/zer0-x/cwitch/archive/refs/tags/v0.3.0.zip
+pip install https://github.com/zefr0x/cwitch/archive/refs/tags/v0.3.0.zip
 ```
 
 > > > You might need to use `pip3` or `python3 -m pip` instead of just `pip`

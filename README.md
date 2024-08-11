@@ -1,3 +1,6 @@
+> [!Warning]
+> This project is no longer maintained. If you are interested, it's free software under the GPL-3.0 license.
+
 # cwitch
 
 [![AUR votes](https://img.shields.io/aur/votes/cwitch?label=AUR%20votes)](https://aur.archlinux.org/packages/cwitch)
